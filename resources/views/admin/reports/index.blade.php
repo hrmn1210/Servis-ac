@@ -9,21 +9,33 @@
     <button class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition duration-200">
         <i class="fas fa-download mr-2"></i>Export PDF
     </button>
-    <button class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition duration-200">
+    <a href="{{ route('admin.reports.index') }}" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition duration-200">
         <i class="fas fa-sync-alt mr-2"></i>Refresh Data
-    </button>
+    </a>
 </div>
 @endsection
 
 @section('content')
-<!-- Summary Cards -->
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+
+    {{-- Monthly Revenue Card --}}
     <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl p-6 text-white">
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-blue-100 text-sm">Monthly Revenue</p>
-                <p class="text-2xl font-bold mt-1">Rp 12.5M</p>
-                <p class="text-blue-100 text-sm mt-2">+15% from last month</p>
+                <p class="text-2xl font-bold mt-1">Rp {{ number_format($summaryStats['monthlyRevenue'], 0, ',', '.') }}</p>
+
+                @if($summaryStats['revenuePercentageChange'] >= 0)
+                <p class="text-blue-100 text-sm mt-2 flex items-center">
+                    <i class="fas fa-arrow-up text-xs mr-1"></i>
+                    +{{ number_format($summaryStats['revenuePercentageChange'], 1) }}% from last month
+                </p>
+                @else
+                <p class="text-red-100 text-sm mt-2 flex items-center">
+                    <i class="fas fa-arrow-down text-xs mr-1"></i>
+                    {{ number_format($summaryStats['revenuePercentageChange'], 1) }}% from last month
+                </p>
+                @endif
             </div>
             <div class="bg-blue-400 p-3 rounded-xl bg-opacity-20">
                 <i class="fas fa-chart-line text-2xl"></i>
@@ -31,12 +43,24 @@
         </div>
     </div>
 
+    {{-- Completed Bookings Card --}}
     <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-2xl p-6 text-white">
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-green-100 text-sm">Completed Bookings</p>
-                <p class="text-2xl font-bold mt-1">156</p>
-                <p class="text-green-100 text-sm mt-2">+8% from last month</p>
+                <p class="text-green-100 text-sm">Completed Bookings (This Month)</p>
+                <p class="text-2xl font-bold mt-1">{{ $summaryStats['completedBookings'] }}</p>
+
+                @if($summaryStats['bookingsPercentageChange'] >= 0)
+                <p class="text-green-100 text-sm mt-2 flex items-center">
+                    <i class="fas fa-arrow-up text-xs mr-1"></i>
+                    +{{ number_format($summaryStats['bookingsPercentageChange'], 1) }}% from last month
+                </p>
+                @else
+                <p class="text-red-100 text-sm mt-2 flex items-center">
+                    <i class="fas fa-arrow-down text-xs mr-1"></i>
+                    {{ number_format($summaryStats['bookingsPercentageChange'], 1) }}% from last month
+                </p>
+                @endif
             </div>
             <div class="bg-green-400 p-3 rounded-xl bg-opacity-20">
                 <i class="fas fa-check-circle text-2xl"></i>
@@ -44,12 +68,24 @@
         </div>
     </div>
 
+    {{-- New Customers Card --}}
     <div class="bg-gradient-to-r from-purple-500 to-purple-600 rounded-2xl p-6 text-white">
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-purple-100 text-sm">New Customers</p>
-                <p class="text-2xl font-bold mt-1">42</p>
-                <p class="text-purple-100 text-sm mt-2">+12% from last month</p>
+                <p class="text-purple-100 text-sm">New Customers (This Month)</p>
+                <p class="text-2xl font-bold mt-1">{{ $summaryStats['newCustomers'] }}</p>
+
+                @if($summaryStats['usersPercentageChange'] >= 0)
+                <p class="text-purple-100 text-sm mt-2 flex items-center">
+                    <i class="fas fa-arrow-up text-xs mr-1"></i>
+                    +{{ number_format($summaryStats['usersPercentageChange'], 1) }}% from last month
+                </p>
+                @else
+                <p class="text-red-100 text-sm mt-2 flex items-center">
+                    <i class="fas fa-arrow-down text-xs mr-1"></i>
+                    {{ number_format($summaryStats['usersPercentageChange'], 1) }}% from last month
+                </p>
+                @endif
             </div>
             <div class="bg-purple-400 p-3 rounded-xl bg-opacity-20">
                 <i class="fas fa-user-plus text-2xl"></i>
@@ -57,12 +93,24 @@
         </div>
     </div>
 
+    {{-- Satisfaction Rate Card --}}
     <div class="bg-gradient-to-r from-orange-500 to-orange-600 rounded-2xl p-6 text-white">
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-orange-100 text-sm">Satisfaction Rate</p>
-                <p class="text-2xl font-bold mt-1">98%</p>
-                <p class="text-orange-100 text-sm mt-2">+2% from last month</p>
+                <p class="text-orange-100 text-sm">Satisfaction Rate (This Month)</p>
+                <p class="text-2xl font-bold mt-1">{{ number_format($summaryStats['satisfactionRate'], 1) }}%</p>
+
+                @if($summaryStats['satisfactionChange'] >= 0)
+                <p class="text-orange-100 text-sm mt-2 flex items-center">
+                    <i class="fas fa-arrow-up text-xs mr-1"></i>
+                    +{{ number_format($summaryStats['satisfactionChange'], 1) }} pts from last month
+                </p>
+                @else
+                <p class="text-red-100 text-sm mt-2 flex items-center">
+                    <i class="fas fa-arrow-down text-xs mr-1"></i>
+                    {{ number_format($summaryStats['satisfactionChange'], 1) }} pts from last month
+                </p>
+                @endif
             </div>
             <div class="bg-orange-400 p-3 rounded-xl bg-opacity-20">
                 <i class="fas fa-star text-2xl"></i>
@@ -71,127 +119,169 @@
     </div>
 </div>
 
-<!-- Charts Section -->
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-    <!-- Revenue Chart -->
+
+    {{-- Revenue Chart --}}
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <div class="flex justify-between items-center mb-6">
-            <h3 class="text-lg font-semibold text-gray-900">Revenue Overview</h3>
-            <select class="border border-gray-300 rounded-lg px-3 py-1 text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                <option>Last 7 days</option>
-                <option>Last 30 days</option>
-                <option selected>Last 90 days</option>
-            </select>
+            <h3 class="text-lg font-semibold text-gray-900">Revenue Overview (Last 30 Days)</h3>
         </div>
-        <div class="h-64 bg-gray-50 rounded-lg flex items-center justify-center">
-            <div class="text-center">
-                <i class="fas fa-chart-bar text-4xl text-gray-300 mb-3"></i>
-                <p class="text-gray-500">Revenue chart will be displayed here</p>
-                @if($revenueData->count() > 0)
-                <p class="text-sm text-gray-400 mt-2">Data available: {{ $revenueData->count() }} days</p>
-                @endif
-            </div>
+        <div class="h-64">
+            <canvas id="revenueChart"></canvas>
         </div>
     </div>
 
-    <!-- Booking Stats -->
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-6">Booking Statistics</h3>
+        <h3 class="text-lg font-semibold text-gray-900 mb-6">Booking Statistics (All Time)</h3>
         <div class="space-y-4">
-            @foreach($bookingStats as $stat)
+            @php
+            $totalBookings = max($bookingStats->sum('count'), 1); // Hindari division by zero
+            @endphp
+            @forelse($bookingStats as $stat)
             <div class="flex items-center justify-between">
                 <span class="text-sm font-medium text-gray-700 capitalize">{{ str_replace('_', ' ', $stat->status) }}</span>
                 <div class="flex items-center space-x-3">
-                    <div class="w-24 bg-gray-200 rounded-full h-2">
-                        <div class="bg-purple-600 h-2 rounded-full" style="width: {{ ($stat->count / max($bookingStats->sum('count'), 1)) * 100 }}%"></div>
+                    <div class="w-32 bg-gray-200 rounded-full h-2">
+                        <div class="bg-purple-600 h-2 rounded-full" style="width: {{ ($stat->count / $totalBookings) * 100 }}%"></div>
                     </div>
                     <span class="text-sm font-semibold text-gray-900 w-8 text-right">{{ $stat->count }}</span>
                 </div>
             </div>
-            @endforeach
+            @empty
+            <p class="text-gray-500">No booking statistics found.</p>
+            @endforelse
         </div>
     </div>
 </div>
 
-<!-- Recent Activity & Top Services -->
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-    <!-- Recent Activity -->
+
+    {{-- Recent Activity --}}
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100">
         <div class="px-6 py-4 border-b border-gray-100">
             <h3 class="text-lg font-semibold text-gray-900">Recent Activity</h3>
         </div>
         <div class="p-6">
             <div class="space-y-4">
+                @forelse($recentActivities as $booking)
                 <div class="flex items-start space-x-3">
-                    <div class="bg-green-100 p-2 rounded-full mt-1">
-                        <i class="fas fa-check-circle text-green-500 text-sm"></i>
+                    <div class="p-2 rounded-full mt-1 
+                        @if($booking->status == 'completed') bg-green-100
+                        @elseif($booking->status == 'assigned') bg-blue-100
+                        @elseif($booking->status == 'pending_verification') bg-yellow-100
+                        @else bg-gray-100 @endif">
+
+                        @if($booking->status == 'completed') <i class="fas fa-check-circle text-green-500 text-sm"></i>
+                        @elseif($booking->status == 'assigned') <i class="fas fa-user-check text-blue-500 text-sm"></i>
+                        @elseif($booking->status == 'pending_verification') <i class="fas fa-clock text-yellow-500 text-sm"></i>
+                        @else <i class="fas fa-info-circle text-gray-500 text-sm"></i> @endif
                     </div>
                     <div class="flex-1">
-                        <p class="text-sm font-medium text-gray-900">Booking completed</p>
-                        <p class="text-xs text-gray-500">AC cleaning for Andi Pelanggan</p>
-                        <p class="text-xs text-gray-400 mt-1">2 hours ago</p>
+                        <p class="text-sm font-medium text-gray-900">
+                            Booking #{{ $booking->id }} {{ $booking->status }}
+                        </p>
+                        <p class="text-xs text-gray-500">
+                            {{ $booking->services->pluck('name')->join(', ') }}
+                            for <strong>{{ $booking->user->name ?? 'N/A' }}</strong>
+                        </p>
+                        <p class="text-xs text-gray-400 mt-1">{{ $booking->updated_at->diffForHumans() }}</p>
                     </div>
                 </div>
-                <div class="flex items-start space-x-3">
-                    <div class="bg-blue-100 p-2 rounded-full mt-1">
-                        <i class="fas fa-user-plus text-blue-500 text-sm"></i>
-                    </div>
-                    <div class="flex-1">
-                        <p class="text-sm font-medium text-gray-900">New user registered</p>
-                        <p class="text-xs text-gray-500">Sari Pelanggan joined the system</p>
-                        <p class="text-xs text-gray-400 mt-1">5 hours ago</p>
-                    </div>
-                </div>
-                <div class="flex items-start space-x-3">
-                    <div class="bg-purple-100 p-2 rounded-full mt-1">
-                        <i class="fas fa-credit-card text-purple-500 text-sm"></i>
-                    </div>
-                    <div class="flex-1">
-                        <p class="text-sm font-medium text-gray-900">Payment received</p>
-                        <p class="text-xs text-gray-500">Rp 150,000 from customer</p>
-                        <p class="text-xs text-gray-400 mt-1">1 day ago</p>
-                    </div>
-                </div>
+                @empty
+                <p class="text-gray-500">No recent activity found.</p>
+                @endforelse
             </div>
         </div>
     </div>
 
-    <!-- Popular Services -->
+    {{-- Popular Services --}}
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100">
         <div class="px-6 py-4 border-b border-gray-100">
             <h3 class="text-lg font-semibold text-gray-900">Popular Services</h3>
         </div>
         <div class="p-6">
             <div class="space-y-4">
+                @forelse($popularServices as $service)
                 <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <div class="flex items-center space-x-3">
                         <div class="bg-blue-100 p-2 rounded-lg">
-                            <i class="fas fa-snowflake text-blue-500"></i>
+                            <i class="fas fa-tools text-blue-500"></i>
                         </div>
-                        <span class="font-medium text-gray-700">AC Cleaning</span>
+                        <span class="font-medium text-gray-700">{{ $service->name }}</span>
                     </div>
-                    <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">45 bookings</span>
+                    <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
+                        {{ $service->bookings_count }} bookings
+                    </span>
                 </div>
-                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <div class="flex items-center space-x-3">
-                        <div class="bg-green-100 p-2 rounded-lg">
-                            <i class="fas fa-tools text-green-500"></i>
-                        </div>
-                        <span class="font-medium text-gray-700">AC Repair</span>
-                    </div>
-                    <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">32 bookings</span>
-                </div>
-                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <div class="flex items-center space-x-3">
-                        <div class="bg-purple-100 p-2 rounded-lg">
-                            <i class="fas fa-gas-pump text-purple-500"></i>
-                        </div>
-                        <span class="font-medium text-gray-700">Freon Refill</span>
-                    </div>
-                    <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs font-medium">28 bookings</span>
-                </div>
+                @empty
+                <p class="text-gray-500">No services found.</p>
+                @endforelse
             </div>
         </div>
     </div>
 </div>
 @endsection
+
+@push('scripts')
+{{-- Tambahkan Chart.js --}}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // --- Revenue Chart ---
+        const ctx = document.getElementById('revenueChart');
+        if (ctx) {
+
+
+
+            const revenueLabels = @json($revenueLabels);
+            const revenueData = @json($revenueValues);
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: revenueLabels,
+                    datasets: [{
+                        label: 'Revenue',
+                        data: revenueData,
+                        borderColor: '#4F46E5', // ungu
+                        backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                // Format Sumbu Y (Rupiah)
+                                callback: function(value, index, values) {
+                                    if (value >= 1000000) {
+                                        return 'Rp ' + (value / 1000000) + 'jt';
+                                    }
+                                    if (value >= 1000) {
+                                        return 'Rp ' + (value / 1000) + 'k';
+                                    }
+                                    return 'Rp ' + value;
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+    });
+</script>
+@endpush

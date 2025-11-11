@@ -41,58 +41,58 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 */
 
 Route::middleware(['auth'])->group(function () {
-
-    Route::get('/dashboard', function () {
-        $user = Auth::user();
-        if ($user->role === 'admin') {
+    Route::get('/home', function () {
+        if (Auth::user()->role == 'admin') {
             return redirect()->route('admin.dashboard');
-        } else {
+        } elseif (Auth::user()->role == 'user') {
             return redirect()->route('user.dashboard');
         }
-    })->name('dashboard');
+        return redirect('/');
+    })->name('home');
 
     /*
     |--------------------------------------------------------------------------
-    | Rute ADMIN - Complete User Management
+    | Rute ADMIN
     |--------------------------------------------------------------------------
     */
-    Route::middleware(['admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::middleware(['role:admin'])->prefix('admin')->name('admin.')->group(function () {
 
-        // Dashboard
-        Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+        Route::controller(AdminController::class)->group(function () {
+            Route::get('/dashboard', 'dashboard')->name('dashboard');
 
-        // Complete User Management
-        Route::get('/users', [AdminController::class, 'users'])->name('users');
-        Route::get('/users/create', [AdminController::class, 'createUser'])->name('users.create');
-        Route::post('/users', [AdminController::class, 'storeUser'])->name('users.store');
-        Route::get('/users/{user}', [AdminController::class, 'showUser'])->name('users.show');
-        Route::get('/users/{user}/edit', [AdminController::class, 'editUser'])->name('users.edit');
-        Route::put('/users/{user}', [AdminController::class, 'updateUser'])->name('users.update');
-        Route::delete('/users/{user}', [AdminController::class, 'destroyUser'])->name('users.destroy');
-        Route::post('/users/{user}/verify', [AdminController::class, 'verifyUser'])->name('users.verify');
-        Route::post('/users/{user}/suspend', [AdminController::class, 'suspendUser'])->name('users.suspend');
-        Route::post('/users/{user}/activate', [AdminController::class, 'activateUser'])->name('users.activate');
-        Route::post('/users/{user}/reset-password', [AdminController::class, 'resetPassword'])->name('users.reset-password');
-        Route::post('/users/bulk-actions', [AdminController::class, 'bulkActions'])->name('users.bulk-actions');
-        Route::get('/users/export', [AdminController::class, 'exportUsers'])->name('users.export');
-        Route::put('/users/{user}/update-role', [AdminController::class, 'updateRole'])->name('users.update-role');
-        // Bookings Management
-        Route::get('/bookings', [AdminController::class, 'bookings'])->name('bookings');
-        Route::get('/bookings/{id}', [AdminController::class, 'showBooking'])->name('bookings.show');
-        Route::put('/bookings/{id}', [AdminController::class, 'updateBooking'])->name('bookings.update');
-        Route::post('/bookings/{id}/assign-technician', [AdminController::class, 'assignTechnician'])->name('bookings.assign-technician');
-        Route::delete('/bookings/{id}', [AdminController::class, 'deleteBooking'])->name('bookings.delete');
+            // Users
+            Route::get('/users', 'users')->name('users.index');
+            Route::get('/users/create', 'createUser')->name('users.create');
+            Route::post('/users', 'storeUser')->name('users.store');
+            Route::get('/users/{user}/edit', 'editUser')->name('users.edit');
+            Route::put('/users/{user}', 'updateUser')->name('users.update');
+            Route::delete('/users/{user}', 'deleteUser')->name('users.delete');
+            Route::get('/users/{user}', 'showUser')->name('users.show');
 
-        // Payments
-        Route::get('/payments', [AdminController::class, 'payments'])->name('payments');
-        Route::get('/payments/{id}', [AdminController::class, 'getPaymentData'])->name('payments.data');
-        Route::put('/payments/{id}', [AdminController::class, 'updatePayment'])->name('payments.update');
-        Route::post('/payments/{id}/refund', [AdminController::class, 'refundPayment'])->name('payments.refund');
-        Route::get('/payments/verification', [AdminController::class, 'paymentVerification'])->name('payments.verification');
-        Route::post('/payments/{id}/verify', [AdminController::class, 'verifyPayment'])->name('payments.verify');
-        // Reports
-        Route::get('/reports', [AdminController::class, 'reports'])->name('reports');
-    });
+            // Bookings
+            Route::get('/bookings', 'bookings')->name('bookings.index');
+            Route::get('/bookings/{id}', 'showBooking')->name('bookings.show');
+            Route::post('/bookings/{id}/status', 'updateBookingStatus')->name('bookings.updateStatus');
+            Route::post('/bookings/{id}/approve', 'approvePendingBooking')->name('bookings.approve');
+            Route::post('/bookings/{id}/reject', 'rejectPendingBooking')->name('bookings.reject');
+
+            // Services
+            Route::get('/services', 'services')->name('services.index');
+            Route::get('/services/create', 'createService')->name('services.create');
+            Route::post('/services', 'storeService')->name('services.store');
+            Route::get('/services/{service}/edit', 'editService')->name('services.edit');
+            Route::put('/services/{service}', 'updateService')->name('services.update');
+            Route::delete('/services/{service}', 'deleteService')->name('services.delete');
+
+            // Payments
+            Route::get('/payments', 'payments')->name('payments.index');
+            Route::post('/payments/{payment}/verify', 'verifyPayment')->name('payments.verify');
+            Route::get('/payments/verification', 'paymentVerification')->name('payments.verification');
+
+            // Reports
+            Route::get('/reports', 'reports')->name('reports.index');
+        });
+    }); // Akhir Rute Admin
 
     /*
     |--------------------------------------------------------------------------
@@ -107,19 +107,23 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/profile', [UserController::class, 'profile'])->name('profile');
         Route::put('/profile', [UserController::class, 'updateProfile'])->name('profile.update');
 
-        // Bookings (Hanya bookings, service requests dihapus)
+        // Bookings
         Route::get('/bookings', [UserController::class, 'bookings'])->name('bookings');
         Route::get('/bookings/create', [UserController::class, 'createBooking'])->name('bookings.create');
         Route::post('/bookings', [UserController::class, 'storeBooking'])->name('bookings.store');
         Route::get('/bookings/{id}', [UserController::class, 'showBooking'])->name('bookings.show');
         Route::post('/bookings/{id}/cancel', [UserController::class, 'cancelBooking'])->name('bookings.cancel');
 
+        // [PERBAIKAN] Rute untuk submit rating DITAMBAHKAN DI SINI
+        Route::post('/bookings/{id}/rate', [UserController::class, 'submitRating'])->name('bookings.rate');
+
         // Payments
         Route::get('/payments', [UserController::class, 'payments'])->name('payments');
         Route::get('/payments/{id}', [UserController::class, 'showPayment'])->name('payments.show');
         Route::post('/payments/{id}/process', [UserController::class, 'processPayment'])->name('payments.process');
-    });
-});
+    }); // Akhir Rute User
+
+}); // Akhir Rute Auth
 
 Route::fallback(function () {
     return response()->view('errors.404', [], 404);
